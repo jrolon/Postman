@@ -1,0 +1,1860 @@
+{
+	"info": {
+		"_postman_id": "a1cd8f97-7045-4273-aee6-f6edaca2756b",
+		"name": "ATHMMS-Small-Debits-Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Create Token -  User 1",
+					"item": [
+						{
+							"name": "01 - Authorize",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var code = postman.getResponseHeader(\"Location\");\r",
+											"if (code !==undefined){\r",
+											"code = code.substring(code.length-16,code.length);\r",
+											"console.log('The code was updated');\r",
+											"pm.collectionVariables.set(\"code\", code);\r",
+											"}else{\r",
+											"\tconsole.log('The code was not updated');\r",
+											"}\r",
+											"console.log(code);\r",
+											"\r",
+											"\r",
+											"var codeSave = pm.collectionVariables.get(\"code\");\r",
+											" if(code == codeSave){\r",
+											"    console.log(\"The code was saved correctly\");\r",
+											"}else{\r",
+											"     console.log(\"The code was not saved correctly\");\r",
+											"}\r",
+											"console.log(code);\r",
+											"console.log(codeSave);\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"//Update Request\r",
+											"\r",
+											"var millisecondsToWait = 3000;\r",
+											"\r",
+											"const updateRSA = {\r",
+											"url: 'https://192.168.234.75:8083/utilityDB/db-update-rsa',\r",
+											"    method: 'POST',\r",
+											"    header: {\r",
+											"        'content-type': 'application/json',\r",
+											"\r",
+											"    },\r",
+											"    body: {\r",
+											"        mode: 'raw',\r",
+											"        raw: JSON.stringify(\r",
+											"{\r",
+											"    \"email\": \"microservicios01@gmail.com\"\r",
+											"}\r",
+											"    )\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"setTimeout(function() {\r",
+											" pm.sendRequest(updateRSA, function (err, response) {\r",
+											"      if (err) {\r",
+											"          throw err;\r",
+											"      }\r",
+											"      \r",
+											"      if (response.code !== 200) {\r",
+											"          throw new Error('Invalid Token.');\r",
+											"      }\r",
+											"      \r",
+											"});\r",
+											"}, millisecondsToWait);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "ATHM-Api-Version",
+										"value": "v1",
+										"type": "text"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "es",
+										"type": "text"
+									},
+									{
+										"key": "deviceid",
+										"value": "Huawei",
+										"type": "text"
+									},
+									{
+										"key": "ipaddress",
+										"value": "127.0.0.1",
+										"type": "text"
+									},
+									{
+										"key": "manufacturer",
+										"value": "android",
+										"type": "text"
+									},
+									{
+										"key": "model",
+										"value": "android",
+										"type": "text"
+									},
+									{
+										"key": "agenttype",
+										"value": "android",
+										"type": "text"
+									},
+									{
+										"key": "operatingSystem",
+										"value": "android",
+										"type": "text"
+									},
+									{
+										"key": "Host",
+										"value": "{{Host}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"response_type\": \"code\",\n    \"scope\": \"openid business.paths.list:read customer.cards:read customer.activity:read customer.cards.transfers:write \",\n    \"client_id\": \"hjkfvu35ntcos9443dzsznanvkysp8sk\",\n    \"redirect_uri\": \"https://app.microservices.com/callback\",\n    \"nonce\": \"989812342174\",\n    \"sso\": {\n        \"appId\": \"73C28DFB99C38EB4BB26B27B3C92E007\",\n        \"appUserId\": \"erik.alvarez\",\n        \"appBundle\": \"com.evertecinc.athmovil.sso-test\"\n    }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{authorization1}}",
+									"host": [
+										"{{authorization1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "02 - Code Exchange",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json().access_token;\r",
+											"pm.collectionVariables.set(\"jwttoken\", jsonData);\r",
+											"\r",
+											"var reqBody = JSON.parse(request.data);\r",
+											"var codeSave = pm.collectionVariables.get(\"code\");\r",
+											"\r",
+											" console.log(reqBody.code);\r",
+											"  console.log(codeSave);\r",
+											"\r",
+											"pm.test(\"Validate Code Authorized\", function(){\r",
+											"    pm.expect(codeSave).to.eql(reqBody.code);\r",
+											"    console.log(reqBody);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "es",
+										"type": "text"
+									},
+									{
+										"key": "deviceid",
+										"value": "android",
+										"type": "text"
+									},
+									{
+										"key": "ipaddress",
+										"value": "127.0.0.1",
+										"type": "text"
+									},
+									{
+										"key": "manufacturer",
+										"value": "android",
+										"type": "text"
+									},
+									{
+										"key": "model",
+										"value": "android",
+										"type": "text"
+									},
+									{
+										"key": "agenttype",
+										"value": "android",
+										"type": "text"
+									},
+									{
+										"key": "operatingSystem",
+										"value": "android",
+										"type": "text"
+									},
+									{
+										"key": "Host",
+										"value": "{{Host}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"grant_type\": \"authorization_code\",\n    \"client_secret\": \"a3p6cfcjwpdpc6y8xye6tfarfa458qhl72o7ln5uo2ym2n9wwn0600pbz7i1sxl5\",\n    \"code\": \"{{code}}\",\n    \"redirect_uri\": \"https://app.microservices.com/callback\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{authorization2}}",
+									"host": [
+										"{{authorization2}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Validate Headers Response",
+			"item": [
+				{
+					"name": "01 - Health",
+					"item": [
+						{
+							"name": "Small debits - Health",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseCode = pm.response.code;\r",
+											"var headerContentType = pm.response.headers.get(\"Content-Type\");\r",
+											"var responseText = pm.iterationData.get(\"ResponseText\");\r",
+											"var status = pm.iterationData.get(\"status\");\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Validate Status\", function () {\r",
+											"    pm.expect(\"success\").to.eql(jsonData.status);\r",
+											"    });\r",
+											"\r",
+											"    pm.test(\"Validate response code\", function(){\r",
+											"    pm.response.to.have.status(responseCode);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"if(headerContentType !== null && headerContentType !== \"\"){\r",
+											"    pm.test(\"Validate header content type\", function () {\r",
+											"       pm.response.to.be.header(\"Content-Type\", headerContentType);\r",
+											"    });\r",
+											"}\r",
+											"\r",
+											"  pm.test(\"Validate JsonFormat\", function(){\r",
+											"    pm.expect(\"application/json\").to.eql(headerContentType);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{Host}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}/health",
+									"host": [
+										"{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}"
+									],
+									"path": [
+										"health"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Small debits - Healthf5",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseCode = pm.response.code;\r",
+											"var headerContentType = pm.response.headers.get(\"Content-Type\");\r",
+											"var  jsonData = pm.response.text();\r",
+											"\r",
+											"    pm.test(\"Validate response code\", function(){\r",
+											"    pm.response.to.have.status(responseCode);\r",
+											"});\r",
+											"\r",
+											"    pm.test(\"Validate service is Alive\", function(){\r",
+											"    pm.expect(\"Service is Alive!\").to.eql(jsonData);\r",
+											"});\r",
+											"\r",
+											"  pm.test(\"Validate textplain\", function(){\r",
+											"    pm.expect(\"text/plain;charset=UTF-8\").to.eql(headerContentType);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{Host}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}/healthf5",
+									"host": [
+										"{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}"
+									],
+									"path": [
+										"healthf5"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "02 - Personal Process",
+					"item": [
+						{
+							"name": "Small Debits - Personal Process - Expired",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var headerContentType = pm.response.headers.get(\"Content-Type\");\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Validate response code\", function() {\r",
+											"    pm.response.to.have.status(401).and.to.have.status(\"Unauthorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate header content type\", function () {\r",
+											"    pm.response.to.be.header(\"Content-Type\", headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate Status\", function () {\r",
+											"    pm.expect(\"error\").to.eql(jsonData.status);\r",
+											"    });\r",
+											"\r",
+											" pm.test(\"Validate JsonFormat\", function(){\r",
+											"    pm.expect(\"application/json\").to.eql(headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate not be null or null\", function(){\r",
+											"    pm.expect(jsonData.message).not.be.null;\r",
+											"    pm.expect(jsonData.errorcode).not.be.null;\r",
+											"    pm.expect(jsonData.data).be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate message\", function() {\r",
+											"    pm.expect(pm.response.text()).to.include(\"The Token has expired on\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate errorcode\", function() {\r",
+											"    pm.expect(jsonData.errorcode).to.eql(\"token.expired\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"\r",
+											"\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJraWQiOiJqa2poYWRmNzg2NDYzNTRzc2RmZ3NkZmciLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIyMTQwNjc0NzMiLCJhdWQiOiJoamtmdnUzNW50Y29zOTQ0M2R6c3puYW52a3lzcDhzayIsImZpSWQiOiJFVlBSIiwibmJmIjoxNjE1NTcwMDA5LCJhenAiOlsiaGprZnZ1MzVudGNvczk0NDNkenN6bmFudmt5c3A4c2siXSwicGVybWlzc2lvbnMiOlsiY3VzdG9tZXIuY2FyZHMudHJhbnNmZXJzOndyaXRlIiwiY3VzdG9tZXIuY2FyZHM6cmVhZCIsIm9wZW5pZCIsImJ1c2luZXNzLnBhdGhzLmxpc3Q6cmVhZCIsImN1c3RvbWVyLmFjdGl2aXR5OnJlYWQiXSwiaXNzIjoiaHR0cHM6Ly9kZXYuZmlhcGkuYXRobW92aWwuY29tL29pZGMvIiwic2NvcGVzIjpbImN1c3RvbWVyLmNhcmRzLnRyYW5zZmVyczp3cml0ZSIsImN1c3RvbWVyLmNhcmRzOnJlYWQiLCJvcGVuaWQiLCJidXNpbmVzcy5wYXRocy5saXN0OnJlYWQiLCJjdXN0b21lci5hY3Rpdml0eTpyZWFkIl0sImV4cCI6MTYxNTU3MDk2OSwiaWF0IjoxNjE1NTcwMDA5LCJub25jZSI6Ijk4OTgxMjM0MjE3NCJ9.nPc_AlU0mEicBB9Y6xCwOrNVO8LXKrGcu11uA_MWezMfuYvD6Vj4xiSUaKQm52FDXf8uMV0HAuraBcfiemqLqF5YmaFxtDimr8kPX2BO_i3ng2QAUmnY_Yw6pe4v2zp6bNTrKPd3k2tefdnLLqz5uKxxmwRr0ePyzTi9rdLZ7Bs6lpOlVMfqc2Ww5PTsZSIovwdp2o0cAhJJeXJeRMnHVJZc-_4COuEgAyVF00ZP41_AhabJA_8SelSGRZMhkAY-4Y80LlCikPK5BUzH_Yn_46CS32Pv1AjFi7PTjZDRLd6YQ5Aj3iHbCt1KukAHF6dnjr-cXhX6aYeoPvo2DGu4OQ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{Host}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\"type\": \"PERSONAL\",\r\n\"sourcePayload\": {\r\n\"customerId\": 214067473,\r\n\"phoneNumber\": \"7874591333\",\r\n\"plasticNumber\": \"aad8d8937d9e1cbd70e4e9c9251f7972c1fa4fe0808ee61e90fb870711e43fa2\",\r\n\"expirationMonth\": \"0afbc7016069d3510713dcac8c063314\",\r\n\"expirationYear\": \"979536301bbd67d8ec57a0122b139e42\",\r\n\"accountSection\": 1\r\n},\r\n\"targetPayload\": {\r\n\"customerId\": 44,\r\n\"phoneNumber\": \"7877599999\",\r\n\"plasticNumber\": \"2150cdeb747dfc05a250c8ff20d6114cc1fa4fe0808ee61e90fb870711e43fa2\",\r\n\"expirationMonth\": \"b973890d1338c182a175923259b09e14\",\r\n\"expirationYear\": \"ff9d85f295cc5c4d370af59924699994\",\r\n\"accountSection\": 1\r\n}\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}/personalProcess",
+									"host": [
+										"{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}"
+									],
+									"path": [
+										"personalProcess"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Small Debits - Personal Process",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var headerContentType = pm.response.headers.get(\"Content-Type\");\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Validate response code\", function() {\r",
+											"    pm.response.to.have.status(200).and.to.have.status(\"OK\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate header content type\", function () {\r",
+											"    pm.response.to.be.header(\"Content-Type\", headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate Status\", function () {\r",
+											"    pm.expect(\"success\").to.eql(jsonData.status);\r",
+											"});\r",
+											"\r",
+											" pm.test(\"Validate JsonFormat\", function(){\r",
+											"    pm.expect(\"application/json\").to.eql(headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate not be null\", function(){\r",
+											"    pm.expect(jsonData.data.depositAmount).not.be.null;\r",
+											"    pm.expect(jsonData.data.debitAmount1).not.be.null;\r",
+											"    pm.expect(jsonData.data.debitAmount2).not.be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Test data type of the response\", function() {\r",
+											"  pm.expect(jsonData).to.be.an(\"object\");\r",
+											"  pm.expect(jsonData.data.depositAmount).to.be.a(\"string\");\r",
+											"  pm.expect(jsonData.data.debitAmount1).to.be.a(\"string\");\r",
+											"  pm.expect(jsonData.data.debitAmount2).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"//----------------------------------------------------------\r",
+											"\r",
+											"var millisecondsToWait = 3000;\r",
+											"\r",
+											"//Consulta a bdd\r",
+											"const echoPostRequestP2B= {\r",
+											"url: 'https://192.168.234.75:8083/utilityDB/db-query',\r",
+											"    method: 'POST',\r",
+											"    header: {\r",
+											"        'content-type': 'application/json'\r",
+											"    },\r",
+											"    body: {\r",
+											"        mode: 'raw',\r",
+											"        raw: JSON.stringify(\r",
+											"{\r",
+											"    \"table\": \"(SELECT * FROM AFFILIATION_TRANSFERS ORDER BY TRANSACTIONDATE DESC)\",\r",
+											"    \"fields\": [\r",
+											"        \"TRANSACTIONID\",\r",
+											"        \"TRANSACTIONDATE\",\r",
+											"        \"SOURCEPHONENUMBER\", \r",
+											"        \"PLASTICNUMBER\",\r",
+											"        \"CUSTOMERID\",\r",
+											"        \"STATUSID\",\r",
+											"        \"ACCOUNTSECTION\",\r",
+											"        \"CHANNELID\",\r",
+											"        \"TRANSACTIONTYPEID\",\r",
+											"        \"AMOUNT\",\r",
+											"        \"TARGETPHONENUMBER\",\r",
+											"        \"TARGETPLASTICNUMBER\",\r",
+											"        \"AUDITTRACENUMBER\",\r",
+											"        \"TERMINALID\",\r",
+											"        \"TERMINALDATA\",\r",
+											"        \"TERMINALREFERENCENUMBER\",\r",
+											"        \"BTRANSSTATUSCODE\",\r",
+											"        \"EFFECTIVEDATE\",\r",
+											"        \"REVERSEDDATE\"\r",
+											"    ],\r",
+											"    \"where\": \"CUSTOMERID = '\"+ pm.variables.get(\"customerID_source\")  +\"' AND rownum <= 2\"\r",
+											"}\r",
+											"        )\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"setTimeout(function() {\r",
+											"\r",
+											"pm.sendRequest(echoPostRequestP2B, function (err, response) {\r",
+											"\r",
+											"      if (err) {\r",
+											"          throw err;\r",
+											"      }\r",
+											"      if (response.code !== 200) {\r",
+											"          throw new Error('Invalid request.');\r",
+											"}\r",
+											"\r",
+											"\r",
+											"\r",
+											"\r",
+											"pm.test(\"Validate data\", function (){\r",
+											"var count = Object.keys(response.json()).length;\r",
+											"console.log(\"The number of cards is: \" + count);\r",
+											"\r",
+											"for(var i= 0; i < count; i++){\r",
+											"    pm.expect(response.json()).to.be.an(\"array\");\r",
+											"    pm.expect(response.json()[i]).to.have.keys('TRANSACTIONID','TRANSACTIONDATE','SOURCEPHONENUMBER', 'PLASTICNUMBER', 'CUSTOMERID', 'STATUSID', 'ACCOUNTSECTION', 'CHANNELID', 'TRANSACTIONTYPEID', 'AMOUNT', 'TARGETPHONENUMBER', 'TARGETPLASTICNUMBER', 'AUDITTRACENUMBER', 'TERMINALID', 'TERMINALDATA', 'TERMINALREFERENCENUMBER', 'BTRANSSTATUSCODE', 'EFFECTIVEDATE', 'REVERSEDDATE').and.be.an(\"object\");\r",
+											"\r",
+											"    var audit = response.json()[i].AUDITTRACENUMBER.toString();\r",
+											"\r",
+											"    pm.expect(response.json()[i].TRANSACTIONID).to.not.be.null;\r",
+											"    pm.expect(pm.variables.get(\"TRANSACTIONDATE\")).to.eql(response.json()[i].TRANSACTIONDATE.substring(0, 10))\r",
+											"    pm.expect(pm.variables.get(\"phoneNumber_source\")).to.eql(response.json()[i].SOURCEPHONENUMBER);\r",
+											"    pm.expect(pm.variables.get(\"plasticNumber_source\")).to.eql(response.json()[i].PLASTICNUMBER);\r",
+											"     pm.expect(pm.variables.get(\"customerID_source\")).to.eql(response.json()[i].CUSTOMERID);\r",
+											"\tpm.expect(pm.variables.get(\"statusID\")).to.eql(response.json()[i].STATUSID);\r",
+											"\tpm.expect(pm.variables.get(\"accountSection_source\")).to.eql(response.json()[i].ACCOUNTSECTION);\r",
+											"\tpm.expect(pm.variables.get(\"channelID\")).to.eql(response.json()[i].CHANNELID);\r",
+											"\tpm.expect(response.json()[i].TRANSACTIONTYPEID).to.eql(pm.variables.get(\"transactionTypeID\"));\r",
+											"    pm.expect(response.json()[i].AMOUNT).to.not.be.null;\r",
+											"\tpm.expect(pm.variables.get(\"phoneNumber_target\")).to.eql(response.json()[i].TARGETPHONENUMBER);\r",
+											"\tpm.expect(pm.variables.get(\"plasticNumber_target\")).to.eql(response.json()[i].TARGETPLASTICNUMBER);\r",
+											"    pm.expect(audit.length).to.eql(5);\r",
+											"\tpm.expect(pm.variables.get(\"btransStatusCode\")).to.eql(response.json()[i].BTRANSSTATUSCODE);\r",
+											"    pm.expect(response.json()[i].REVERSEDDATE).have.null;\r",
+											"    pm.expect(response.json()[i].TERMINALID).have.null;\r",
+											"\tpm.expect(response.json()[i].TERMINALDATA).have.null;\r",
+											"    pm.expect(pm.variables.get(\"EFFECTIVEDATE\")).to.eql(response.json()[i].EFFECTIVEDATE.substring(0, 10))\r",
+											"\tpm.expect(response.json()[i].TERMINALREFERENCENUMBER).have.null;\r",
+											"    \r",
+											"}\r",
+											"});\r",
+											"\r",
+											"\r",
+											"});\r",
+											"}, millisecondsToWait);\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwttoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{Host}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"type\": \"{{type}}\",\r\n    \"sourcePayload\": {\r\n        \"customerId\": {{customerID_source}},\r\n        \"phoneNumber\": \"{{phoneNumber_source}}\",\r\n        \"plasticNumber\": \"{{plasticNumber_source}}\",\r\n        \"expirationMonth\": \"{{expirationMonth_source}}\",\r\n        \"expirationYear\": \"{{expirationYear_source}}\",\r\n        \"accountSection\": {{accountSection_source}}\r\n    },\r\n    \"targetPayload\": {\r\n        \"customerId\": {{customerID_target}},\r\n        \"phoneNumber\": \"{{phoneNumber_target}}\",\r\n        \"plasticNumber\": \"{{plasticNumber_target}}\",\r\n        \"expirationMonth\": \"{{expirationMonth_target}}\",\r\n        \"expirationYear\": \"{{expirationYear_target}}\",\r\n        \"accountSection\": {{accountSection_target}}\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}/personalProcess",
+									"host": [
+										"{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}"
+									],
+									"path": [
+										"personalProcess"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Small Debits - Personal Process - Token Invalid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var headerContentType = pm.response.headers.get(\"Content-Type\");\r",
+											"var code = pm.response.code;\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Validate response code\", function() {\r",
+											"    pm.response.to.have.status(401).and.to.have.status(\"Unauthorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate header content type\", function () {\r",
+											"    pm.response.to.be.header(\"Content-Type\", headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate Status\", function () {\r",
+											"    pm.expect(\"error\").to.eql(jsonData.status);\r",
+											"    });\r",
+											"\r",
+											" pm.test(\"Validate JsonFormat\", function(){\r",
+											"    pm.expect(\"application/json\").to.eql(headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate not be null or null\", function(){\r",
+											"    pm.expect(jsonData.message).not.be.null;\r",
+											"    pm.expect(jsonData.errorcode).not.be.null;\r",
+											"    pm.expect(jsonData.data).be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate message\", function() {\r",
+											"  pm.expect(jsonData.message).to.eql(\"The string sended doesn't have a valid JSON format.\");\r",
+											"   pm.expect(jsonData.errorcode).to.eql(\"token.decode.invalid\");\r",
+											"  \r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJwwwqiOiJxxxxpoYWRmNzg2NDYzNTRzc2RmZ3NkZmciLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIyMTQwNjc0NzMiLCJhdWQiOiJnenJiY3lubWlldmhvNnJjbmZrMnVuczY0ZXg0cXlkNiIsImZpSWQiOiJCUFBSIiwibmJmIjoxNjA4MDQ4MTAyLCJhenAiOlsiZ3pyYmN5bm1pZXZobzZyY25mazJ1bnM2NGV4NHF5ZDYiXSwicGVybWlzc2lvbnMiOlsiY3VzdG9tZXIuY2FyZHM6cmVhZCIsImN1c3RvbWVyLmNhcmRzLnRyYW5zZmVyczp3cml0ZSIsIm9wZW5pZCIsImJ1c2luZXNzLnBhdGhzLmxpc3Q6cmVhZCIsImN1c3RvbWVyLmFjdGl2aXR5OnJlYWQiXSwiaXNzIjoiaHR0cHM6Ly9kZXYuZmlhcGkuYXRobW92aWwuY29tL29pZGMvIiwic2NvcGVzIjpbImN1c3RvbWVyLmNhcmRzOnJlYWQiLCJjdXN0b21lci5jYXJkcy50cmFuc2ZlcnM6d3JpdGUiLCJvcGVuaWQiLCJidXNpbmVzcy5wYXRocy5saXN0OnJlYWQiLCJjdXN0b21lci5hY3Rpdml0eTpyZWFkIl0sImV4cCI6MTYwODA0OTA2MiwiaWF0IjoxNjA4MDQ4MTAyLCJub25jZSI6Ijk4OTgxMjM0MjE2OCJ9.ERbBRPkFaSdTn5ETFQfikQIHkE2VbQC-Q3uAchQUK7LXh5gxcRwtEg4fk1SVy-atkdGzyS7jUrwgbD314Ah8z4q_2UQdRJHGlG03tE0MTYQQjo95-FHwBs0pCuf5nX_h1R4rdiQa_cfU6NZkWLeK31LCH1YoAm9Rw-c8JCrMkzK_YvVmEOJxCllV_-xSKtJHe9yeca-usvvGtpTQNsA81MzrWxYxdDGF4gzUrMqaAbAnqolqlESWyVCj75o7fW2Uhhww6obi9cSkRM4l0TRCGEZ3wRR_az46F_i7N-T5t8kEKv4Fcm02rYs2CQfHcvl8eaTODpzy4zFrllReEIyTTAxxx",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{Host}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"type\": \"PERSONAL\",\r\n    \"sourcePayload\": {\r\n        \"customerId\": 214067473,\r\n        \"phoneNumber\": \"7874591333\",\r\n        \"plasticNumber\": \"aad8d8937d9e1cbd70e4e9c9251f7972c1fa4fe0808ee61e90fb870711e43fa2\",\r\n        \"expirationMonth\": \"0afbc7016069d3510713dcac8c063314\",\r\n        \"expirationYear\": \"979536301bbd67d8ec57a0122b139e42\",\r\n        \"accountSection\": 1\r\n    },\r\n    \"targetPayload\": {\r\n        \"customerId\": 44,\r\n        \"phoneNumber\": \"7877599999\",\r\n        \"plasticNumber\": \"2150cdeb747dfc05a250c8ff20d6114cc1fa4fe0808ee61e90fb870711e43fa2\",\r\n        \"expirationMonth\": \"b973890d1338c182a175923259b09e14\",\r\n        \"expirationYear\": \"ff9d85f295cc5c4d370af59924699994\",\r\n        \"accountSection\": 1\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}/personalProcess",
+									"host": [
+										"{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}"
+									],
+									"path": [
+										"personalProcess"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Small Debits - Personal Process - Invalid CardNumber",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var headerContentType = pm.response.headers.get(\"Content-Type\");\r",
+											"var code = pm.response.code;\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Validate response code\", function() {\r",
+											"    pm.response.to.have.status(409).and.to.have.status(\"Conflict\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate header content type\", function () {\r",
+											"    pm.response.to.be.header(\"Content-Type\", headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate Status\", function () {\r",
+											"    pm.expect(\"error\").to.eql(jsonData.status);\r",
+											"    });\r",
+											"\r",
+											" pm.test(\"Validate JsonFormat\", function(){\r",
+											"    pm.expect(\"application/json\").to.eql(headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate not be null or null\", function(){\r",
+											"    pm.expect(jsonData.message).not.be.null;\r",
+											"    pm.expect(jsonData.errorcode).not.be.null;\r",
+											"    pm.expect(jsonData.data).be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate message\", function() {\r",
+											"  pm.expect(jsonData.message).to.eql(\"Error with debit amount 1\");\r",
+											"   pm.expect(jsonData.errorcode).to.eql(\"smalldebit.error.debit1\");\r",
+											"  \r",
+											"});\r",
+											"\r",
+											"//----------------------------------------------------------\r",
+											"\r",
+											"var millisecondsToWait = 3000;\r",
+											"\r",
+											"//Consulta a bdd\r",
+											"const echoPostRequestP2B= {\r",
+											"url: 'https://192.168.234.75:8083/utilityDB/db-query',\r",
+											"    method: 'POST',\r",
+											"    header: {\r",
+											"        'content-type': 'application/json'\r",
+											"    },\r",
+											"    body: {\r",
+											"        mode: 'raw',\r",
+											"        raw: JSON.stringify(\r",
+											"{\r",
+											"    \"table\": \"(SELECT * FROM AFFILIATION_TRANSFERS ORDER BY TRANSACTIONDATE DESC)\",\r",
+											"    \"fields\": [\r",
+											"        \"TRANSACTIONID\",\r",
+											"        \"TRANSACTIONDATE\",\r",
+											"        \"SOURCEPHONENUMBER\", \r",
+											"        \"PLASTICNUMBER\",\r",
+											"        \"CUSTOMERID\",\r",
+											"        \"STATUSID\",\r",
+											"        \"ACCOUNTSECTION\",\r",
+											"        \"CHANNELID\",\r",
+											"        \"TRANSACTIONTYPEID\",\r",
+											"        \"TARGETCUSTOMERID\",\r",
+											"        \"AMOUNT\",\r",
+											"        \"TARGETPHONENUMBER\",\r",
+											"        \"TARGETPLASTICNUMBER\",\r",
+											"        \"AUDITTRACENUMBER\",\r",
+											"        \"TERMINALID\",\r",
+											"        \"TERMINALDATA\",\r",
+											"        \"TERMINALREFERENCENUMBER\",\r",
+											"        \"BTRANSSTATUSCODE\",\r",
+											"        \"EFFECTIVEDATE\",\r",
+											"        \"REVERSEDDATE\"\r",
+											"    ],\r",
+											"    \"where\": \"CUSTOMERID = '\"+ pm.variables.get(\"customerID_source\")  +\"' AND rownum <= 2\"\r",
+											"}\r",
+											"        )\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"setTimeout(function() {\r",
+											"\r",
+											"pm.sendRequest(echoPostRequestP2B, function (err, response) {\r",
+											"\r",
+											"      if (err) {\r",
+											"          throw err;\r",
+											"      }\r",
+											"      if (response.code !== 200) {\r",
+											"          throw new Error('Invalid request.');\r",
+											"      }\r",
+											"\r",
+											"pm.test(\"Validate TRANSACTIONID\", function () {\r",
+											"     pm.expect(response.json()[0].TRANSACTIONID).to.not.be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate TRANSACTIONDATE\", function () {\r",
+											"     pm.expect(pm.variables.get(\"TRANSACTIONDATE\")).to.eql(response.json()[0].TRANSACTIONDATE.substring(0, 10));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate TRANSACTIONTYPE\", function () {\r",
+											"     pm.expect(response.json()[0].TRANSACTIONTYPE).to.eql(pm.variables.get(\"transactionType\"));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate TARGETPLASTICNUMBER\", function () {\r",
+											"     pm.expect(pm.variables.get(\"plasticNumberInvalid\")).to.eql(response.json()[0].TARGETPLASTICNUMBER);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate TARGETCUSTOMERID\", function () {\r",
+											"       pm.expect(pm.variables.get(\"customerID_target\")).to.eql(response.json()[0].TARGETCUSTOMERID);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate STATUSID\", function () {\r",
+											"    pm.expect(pm.variables.get(\"statusID_Error\")).to.eql(response.json()[0].STATUSID);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate REVERSEDDATE\", function () {\r",
+											"    pm.expect(response.json()[0].REVERSEDDATE).have.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate EFFECTIVEDATE\", function () {\r",
+											"     pm.expect(response.json()[0].EFFECTIVEDATE).to.be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate CUSTOMERID\", function () {\r",
+											"    pm.expect(pm.variables.get(\"customerID_source\")).to.eql(response.json()[0].CUSTOMERID);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate CHANNELID\", function () {\r",
+											"    pm.expect(pm.variables.get(\"channelID\")).to.eql(response.json()[0].CHANNELID);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate BTRANSSTATUSCODE\", function () {\r",
+											"   \tpm.expect(response.json()[0].BTRANSSTATUSCODE).to.be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate AUDITTRACENUMBER\", function () {\r",
+											"    var audit = response.json()[0].AUDITTRACENUMBER.toString();\r",
+											"    pm.expect(audit.length).to.eql(5);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate AMOUNT\", function () {\r",
+											"        pm.expect(response.json()[0].AMOUNT).to.not.be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate ACCOUNTSECTION\", function () {\r",
+											"    pm.expect(pm.variables.get(\"accountSection_source\")).to.eql(response.json()[0].ACCOUNTSECTION);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate SOURCEID\", function () {\r",
+											"    pm.expect(pm.variables.get(\"sourceID\")).to.eql(response.json()[0].SOURCEID);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"});\r",
+											"}, millisecondsToWait);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwttoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{Host}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"type\": \"{{type}}\",\r\n    \"sourcePayload\": {\r\n        \"customerId\": {{customerID_source}},\r\n        \"phoneNumber\": \"{{phoneNumber_source}}\",\r\n        \"plasticNumber\": \"{{plasticNumberInvalid}}\",\r\n        \"expirationMonth\": \"{{expirationMonth_source}}\",\r\n        \"expirationYear\": \"{{expirationYear_source}}\",\r\n        \"accountSection\": {{accountSection_source}}\r\n    },\r\n    \"targetPayload\": {\r\n        \"customerId\": {{customerID_target}},\r\n        \"phoneNumber\": \"{{phoneNumber_target}}\",\r\n        \"plasticNumber\": \"{{plasticNumberInvalid}}\",\r\n        \"expirationMonth\": \"{{expirationMonth_target}}\",\r\n        \"expirationYear\": \"{{expirationYear_target}}\",\r\n        \"accountSection\": {{accountSection_target}}\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}/personalProcess",
+									"host": [
+										"{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}"
+									],
+									"path": [
+										"personalProcess"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Small Debits - Personal Process - Unauthorized",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var headerContentType = pm.response.headers.get(\"Content-Type\");\r",
+											"var code = pm.response.code;\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Validate response code\", function() {\r",
+											"    pm.response.to.have.status(401).and.to.have.status(\"Unauthorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate header content type\", function () {\r",
+											"    pm.response.to.be.header(\"Content-Type\", headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate Status\", function () {\r",
+											"    pm.expect(\"error\").to.eql(jsonData.status);\r",
+											"    });\r",
+											"\r",
+											" pm.test(\"Validate JsonFormat\", function(){\r",
+											"    pm.expect(\"application/json\").to.eql(headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate not be null or null\", function(){\r",
+											"    pm.expect(jsonData.message).not.be.null;\r",
+											"    pm.expect(jsonData.errorcode).not.be.null;\r",
+											"    pm.expect(jsonData.data).be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate message\", function() {\r",
+											"  pm.expect(jsonData.message).to.eql(\"No authorization header present.\");\r",
+											"   pm.expect(jsonData.errorcode).to.eql(\"token.invalid.header\");\r",
+											"  \r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{Host}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\"type\": \"PERSONAL\",\r\n\"sourcePayload\": {\r\n\"customerId\": 214067473,\r\n\"phoneNumber\": \"7874591333\",\r\n\"plasticNumber\": \"aad8d8937d9e1cbd70e4e9c9251f7972c1fa4fe0808ee61e90fb870711e43fa2\",\r\n\"expirationMonth\": \"0afbc7016069d3510713dcac8c063314\",\r\n\"expirationYear\": \"979536301bbd67d8ec57a0122b139e42\",\r\n\"accountSection\": 1\r\n},\r\n\"targetPayload\": {\r\n\"customerId\": 44,\r\n\"phoneNumber\": \"7877599999\",\r\n\"plasticNumber\": \"2150cdeb747dfc05a250c8ff20d6114cc1fa4fe0808ee61e90fb870711e43fa2\",\r\n\"expirationMonth\": \"b973890d1338c182a175923259b09e14\",\r\n\"expirationYear\": \"ff9d85f295cc5c4d370af59924699994\",\r\n\"accountSection\": 1\r\n}\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}/personalProcess",
+									"host": [
+										"{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}"
+									],
+									"path": [
+										"personalProcess"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"//Small-Debits PERSONAL PROCESS",
+									"pm.variables.set(\"type\", \"PERSONAL\");",
+									"pm.variables.set(\"statusID\", 9);",
+									"pm.variables.set(\"statusID_Error\", 12);",
+									"pm.variables.set(\"channelID\", 5);",
+									"pm.variables.set(\"transactionTypeID\", 6);",
+									"pm.variables.set(\"btransStatusCode\", \"00\");",
+									"pm.variables.set(\"TRANSACTIONDATE\", new Date(Date.now()).toISOString().substring(0,10));",
+									"pm.variables.set(\"EFFECTIVEDATE\", new Date(Date.now()).toISOString().substring(0,10));",
+									"pm.variables.set(\"plasticNumberInvalid\", \"xad3534539e1cbd70e4e9c9251f7972c1fa4fe0808ee61e90fb870711e43fa2\");",
+									"",
+									"//sourcePayload",
+									"pm.variables.set(\"customerID_source\", 215070138);",
+									"pm.variables.set(\"phoneNumber_source\", 7874591333);",
+									"pm.variables.set(\"plasticNumber_source\", \"b416a0744510b5194da92ecb42686b70c1fa4fe0808ee61e90fb870711e43fa2\");",
+									"pm.variables.set(\"expirationMonth_source\", \"2856a484a75a27b411c09cd9f574c1ae\");",
+									"pm.variables.set(\"expirationYear_source\", \"338d0edcedd69ff02c89d7498ba4c9cb\");",
+									"pm.variables.set(\"accountSection_source\", 1);",
+									"",
+									"//targetPayload",
+									"pm.variables.set(\"customerID_target\", 215070081);",
+									"pm.variables.set(\"phoneNumber_target\", 7877599999);",
+									"pm.variables.set(\"plasticNumber_target\", \"77f028343c8a52fabe6028f109c11995c1fa4fe0808ee61e90fb870711e43fa2\");",
+									"pm.variables.set(\"expirationMonth_target\", \"b973890d1338c182a175923259b09e14\");",
+									"pm.variables.set(\"expirationYear_target\", \"01dc10f0c0015803c8c588dde51c7377\");",
+									"pm.variables.set(\"accountSection_target\", 1);",
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "03 - Business Process",
+					"item": [
+						{
+							"name": "Small Debits - Business Process - Token Invalid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var headerContentType = pm.response.headers.get(\"Content-Type\");\r",
+											"var code = pm.response.code;\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Validate response code\", function() {\r",
+											"    pm.response.to.have.status(401).and.to.have.status(\"Unauthorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate header content type\", function () {\r",
+											"    pm.response.to.be.header(\"Content-Type\", headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate Status\", function () {\r",
+											"    pm.expect(\"error\").to.eql(jsonData.status);\r",
+											"    });\r",
+											"\r",
+											" pm.test(\"Validate JsonFormat\", function(){\r",
+											"    pm.expect(\"application/json\").to.eql(headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate not be null or null\", function(){\r",
+											"    pm.expect(jsonData.message).not.be.null;\r",
+											"    pm.expect(jsonData.errorcode).not.be.null;\r",
+											"    pm.expect(jsonData.data).be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate message\", function() {\r",
+											"  pm.expect(jsonData.message).to.eql(\"The Token's Signature resulted invalid when verified using the Algorithm: SHA256withRSA\");\r",
+											"   pm.expect(jsonData.errorcode).to.eql(\"token.decode.invalid\");\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJraWQiOiJqa2poYWRmNzg2NDYzNTRzc2RmZ3NkZmciLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIyMTQwNTcyMDUiLCJhdWQiOiIwbGk4YmZ4YnNsNnhrb2IycjVxeHY3aDFjbGNiZ2x0MCIsImZpSWQiOiJFVlBSIiwibmJmIjoxNjA5MzQ2MTA4LCJhenAiOlsiMGxpOGJmeGJzbDZ4a29iMnI1cXh2N2gxY2xjYmdsdDAiXSwicGVybWlzc2lvbnMiOlsiY3VzdG9tZXIuY2FyZHM6cmVhZCIsImN1c3RvbWVyLmNhcmRzLnRyYW5zZmVyczp3cml0ZSIsIm9wZW5pZCIsImJ1c2luZXNzLnBhdGhzLmxpc3Q6cmVhZCIsImN1c3RvbWVyLmFjdGl2aXR5OnJlYWQiXSwiaXNzIjoiaHR0cHM6Ly9kZXYuZmlhcGkuYXRobW92aWwuY29tL29pZGMvIiwic2NvcGVzIjpbImN1c3RvbWVyLmNhcmRzOnJlYWQiLCJjdXN0b21lci5jYXJkcy50cmFuc2ZlcnM6d3JpdGUiLCJvcGVuaWQiLCJidXNpbmVzcy5wYXRocy5saXN0OnJlYWQiLCJjdXN0b21lci5hY3Rpdml0eTpyZWFkIl0sImV4cCI6MTYwOTM0NzA2OCwiaWF0IjoxNjA5MzQ2MTA4LCJub25jZSI6Ijk4OTgxMjM0MjE2OCJ9.aL6k2ryFPDMVgqZW4UZozCARc7wvzWKC1DrT4aJpg9ewoypzzj1-AfJ7zRykaMOkbgVzghdyB0pD_ykBWBP2kzBZWKX-utmfvByoMHLxk84ZzmZOzCk4phjbAQq04ZkawyZzddUTxmRgkNGFtXX4rRQpDtTUGDwpLue05HannHxHWSKL3OociKk5p-Mk6C4aj3b13lqF8I6M_W-67PLoQtKvGnJEmjtHcOWqgVMxwS-1gn6WR69Jf5Rx0v3SJBWZ2ldSp9dXTf9nmyuhsogZAmYSiTl_pBFlMIo0Kx7BL_mkKZ9MSG3fs-3etNddOBoE7mhW8nrpJaq9W_cKexxx",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{Host}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\"type\": \"PERSONAL\",\r\n\"sourcePayload\": {\r\n\"customerId\": 214067473,\r\n\"phoneNumber\": \"7874591333\",\r\n\"plasticNumber\": \"aad8d8937d9e1cbd70e4e9c9251f7972c1fa4fe0808ee61e90fb870711e43fa2\",\r\n\"expirationMonth\": \"0afbc7016069d3510713dcac8c063314\",\r\n\"expirationYear\": \"979536301bbd67d8ec57a0122b139e42\",\r\n\"accountSection\": 1\r\n},\r\n\"targetPayload\": {\r\n\"customerId\": 44,\r\n\"phoneNumber\": \"7877599999\",\r\n\"plasticNumber\": \"2150cdeb747dfc05a250c8ff20d6114cc1fa4fe0808ee61e90fb870711e43fa2\",\r\n\"expirationMonth\": \"b973890d1338c182a175923259b09e14\",\r\n\"expirationYear\": \"ff9d85f295cc5c4d370af59924699994\",\r\n\"accountSection\": 1\r\n}\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}/businessProcess",
+									"host": [
+										"{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}"
+									],
+									"path": [
+										"businessProcess"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Small Debits - Businessl Process - Unauthorized",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var headerContentType = pm.response.headers.get(\"Content-Type\");\r",
+											"var code = pm.response.code;\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Validate response code\", function() {\r",
+											"    pm.response.to.have.status(401).and.to.have.status(\"Unauthorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate header content type\", function () {\r",
+											"    pm.response.to.be.header(\"Content-Type\", headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate Status\", function () {\r",
+											"    pm.expect(\"error\").to.eql(jsonData.status);\r",
+											"    });\r",
+											"\r",
+											" pm.test(\"Validate JsonFormat\", function(){\r",
+											"    pm.expect(\"application/json\").to.eql(headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate not be null or null\", function(){\r",
+											"    pm.expect(jsonData.message).not.be.null;\r",
+											"    pm.expect(jsonData.errorcode).not.be.null;\r",
+											"    pm.expect(jsonData.data).be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate message\", function() {\r",
+											"  pm.expect(jsonData.message).to.eql(\"No authorization header present.\");\r",
+											"   pm.expect(jsonData.errorcode).to.eql(\"token.invalid.header\");\r",
+											"  \r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{Host}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\"type\": \"PERSONAL\",\r\n\"sourcePayload\": {\r\n\"customerId\": 214067473,\r\n\"phoneNumber\": \"7874591333\",\r\n\"plasticNumber\": \"aad8d8937d9e1cbd70e4e9c9251f7972c1fa4fe0808ee61e90fb870711e43fa2\",\r\n\"expirationMonth\": \"0afbc7016069d3510713dcac8c063314\",\r\n\"expirationYear\": \"979536301bbd67d8ec57a0122b139e42\",\r\n\"accountSection\": 1\r\n},\r\n\"targetPayload\": {\r\n\"customerId\": 44,\r\n\"phoneNumber\": \"7877599999\",\r\n\"plasticNumber\": \"2150cdeb747dfc05a250c8ff20d6114cc1fa4fe0808ee61e90fb870711e43fa2\",\r\n\"expirationMonth\": \"b973890d1338c182a175923259b09e14\",\r\n\"expirationYear\": \"ff9d85f295cc5c4d370af59924699994\",\r\n\"accountSection\": 1\r\n}\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}/businessProcess",
+									"host": [
+										"{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}"
+									],
+									"path": [
+										"businessProcess"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Small Debits - Business Process - Invalid CardNumber",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var headerContentType = pm.response.headers.get(\"Content-Type\");\r",
+											"var code = pm.response.code;\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Validate response code\", function() {\r",
+											"    pm.response.to.have.status(409).and.to.have.status(\"Conflict\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate header content type\", function () {\r",
+											"    pm.response.to.be.header(\"Content-Type\", headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate Status\", function () {\r",
+											"    pm.expect(\"error\").to.eql(jsonData.status);\r",
+											"    });\r",
+											"\r",
+											" pm.test(\"Validate JsonFormat\", function(){\r",
+											"    pm.expect(\"application/json\").to.eql(headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate not be null or null\", function(){\r",
+											"    pm.expect(jsonData.message).not.be.null;\r",
+											"    pm.expect(jsonData.errorcode).not.be.null;\r",
+											"    pm.expect(jsonData.data).be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate message\", function() {\r",
+											"  pm.expect(jsonData.message).to.eql(\"Error with debit amount 1\");\r",
+											"   pm.expect(jsonData.errorcode).to.eql(\"smalldebit.error.debit1\");\r",
+											"  \r",
+											"});\r",
+											"\r",
+											"//----------------------------------------------------------\r",
+											"\r",
+											"var millisecondsToWait = 3000;\r",
+											"\r",
+											"//Consulta a bdd\r",
+											"const echoPostRequest= {\r",
+											"url: 'https://192.168.234.75:8083/utilityDB/db-query',\r",
+											"    method: 'POST',\r",
+											"    header: {\r",
+											"        'content-type': 'application/json'\r",
+											"    },\r",
+											"    body: {\r",
+											"        mode: 'raw',\r",
+											"        raw: JSON.stringify(\r",
+											"{\r",
+											"    \"table\": \"(SELECT * FROM BUSINESS_AFFILIATION_TRANSFERS ORDER BY TRANSACTIONDATE DESC)\",\r",
+											"    \"fields\": [\r",
+											"        \"TRANSACTIONID\",\r",
+											"        \"TRANSACTIONTYPE\",\r",
+											"        \"TRANSACTIONDATE\",\r",
+											"        \"TARGETPLASTICNUMBER\", \r",
+											"        \"TARGETCUSTOMERID\",\r",
+											"        \"TRANSACTIONSTATUS\",\r",
+											"        \"REVERSEDDATE\",\r",
+											"        \"SOURCEPLASTICNUMBER\",\r",
+											"        \"EFFECTIVEDATE\",\r",
+											"        \"SOURCECUSTOMERID\",\r",
+											"        \"CHANNELID\",\r",
+											"        \"BTRANSSTATUSCODE\",\r",
+											"        \"AUDITTRACENUMBER\",\r",
+											"        \"AMOUNT\",\r",
+											"        \"ACCOUNTSECTION\",\r",
+											"        \"SOURCEID\",\r",
+											"        \"TARGETID\"\r",
+											"    ],\r",
+											"    \"where\": \"SOURCEID = '\"+ pm.variables.get(\"sourceID\") +\"' AND rownum <= 1\"\r",
+											"}\r",
+											"        )\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"setTimeout(function() {\r",
+											"\r",
+											"pm.sendRequest(echoPostRequest, function (err, response) {\r",
+											"\r",
+											"      if (err) {\r",
+											"          throw err;\r",
+											"      }\r",
+											"      if (response.code !== 200) {\r",
+											"          throw new Error('Invalid request.');\r",
+											"      }\r",
+											"\r",
+											"pm.test(\"Validate TRANSACTIONID\", function () {\r",
+											"     pm.expect(response.json()[0].TRANSACTIONID).to.not.be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate TRANSACTIONDATE\", function () {\r",
+											"     pm.expect(pm.variables.get(\"TRANSACTIONDATE\")).to.eql(response.json()[0].TRANSACTIONDATE.substring(0, 10));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate TRANSACTIONTYPE\", function () {\r",
+											"     pm.expect(response.json()[0].TRANSACTIONTYPE).to.eql(pm.variables.get(\"transactionType\"));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate TARGETPLASTICNUMBER\", function () {\r",
+											"     pm.expect(pm.variables.get(\"plasticNumber_target\")).to.eql(response.json()[0].TARGETPLASTICNUMBER);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate TARGETCUSTOMERID\", function () {\r",
+											"       pm.expect(pm.variables.get(\"customerID_target\")).to.eql(response.json()[0].TARGETCUSTOMERID);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate TRANSACTIONSTATUS\", function () {\r",
+											"    pm.expect(pm.variables.get(\"statusError\")).to.eql(response.json()[0].TRANSACTIONSTATUS);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate REVERSEDDATE\", function () {\r",
+											"    pm.expect(response.json()[0].REVERSEDDATE).have.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate SOURCEPLASTICNUMBER\", function () {\r",
+											"    pm.expect(pm.variables.get(\"plasticNumberInvalid\")).to.eql(response.json()[0].SOURCEPLASTICNUMBER);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate EFFECTIVEDATE\", function () {\r",
+											"     pm.expect(response.json()[0].EFFECTIVEDATE).to.be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate SOURCECUSTOMERID\", function () {\r",
+											"    pm.expect(pm.variables.get(\"customerID_source\")).to.eql(response.json()[0].SOURCECUSTOMERID);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate CHANNELID\", function () {\r",
+											"    pm.expect(pm.variables.get(\"channelID\")).to.eql(response.json()[0].CHANNELID);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate BTRANSSTATUSCODE\", function () {\r",
+											"    pm.expect(response.json()[0].BTRANSSTATUSCODE).to.be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate AUDITTRACENUMBER\", function () {\r",
+											"    var audit = response.json()[0].AUDITTRACENUMBER.toString();\r",
+											"    pm.expect(audit.length).to.eql(5);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate AMOUNT\", function () {\r",
+											"        pm.expect(response.json()[0].AMOUNT).to.not.be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate ACCOUNTSECTION\", function () {\r",
+											"    pm.expect(pm.variables.get(\"accountSection_source\")).to.eql(response.json()[0].ACCOUNTSECTION);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate SOURCEID\", function () {\r",
+											"    pm.expect(pm.variables.get(\"sourceID\")).to.eql(response.json()[0].SOURCEID);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate TARGETID\", function () {\r",
+											"    pm.expect(response.json()[0].TARGETID).to.be.null;\r",
+											"});\r",
+											"    \r",
+											"\r",
+											"});\r",
+											"}, millisecondsToWait);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwttoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{Host}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\"type\": \"BUSINESS\",\r\n\"sourcePayload\": {\r\n\"customerId\": 215070138,\r\n\"phoneNumber\": \"7874591333\",\r\n\"plasticNumber\": \"{{plasticNumberInvalid}}\",\r\n\"expirationMonth\": \"0afbc7016069d3510713dcac8c063314\",\r\n\"expirationYear\": \"979536301bbd67d8ec57a0122b139e42\",\r\n\"accountSection\": 1\r\n},\r\n\"targetPayload\": {\r\n\"customerId\": 44,\r\n\"phoneNumber\": \"7877599999\",\r\n\"plasticNumber\": \"2150cdeb747dfc05a250c8ff20d6114cc1fa4fe0808ee61e90fb870711e43fa2\",\r\n\"expirationMonth\": \"b973890d1338c182a175923259b09e14\",\r\n\"expirationYear\": \"ff9d85f295cc5c4d370af59924699994\",\r\n\"accountSection\": 1\r\n}\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}/businessProcess",
+									"host": [
+										"{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}"
+									],
+									"path": [
+										"businessProcess"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Small Debits - Buisness Process",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var headerContentType = pm.response.headers.get(\"Content-Type\");\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Validate response code\", function() {\r",
+											"    pm.response.to.have.status(200).and.to.have.status(\"OK\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate header content type\", function () {\r",
+											"    pm.response.to.be.header(\"Content-Type\", headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate Status\", function () {\r",
+											"    pm.expect(\"success\").to.eql(jsonData.status);\r",
+											"});\r",
+											"\r",
+											" pm.test(\"Validate JsonFormat\", function(){\r",
+											"    pm.expect(\"application/json\").to.eql(headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate not be null\", function(){\r",
+											"    pm.expect(jsonData.data.depositAmount).not.be.null;\r",
+											"    pm.expect(jsonData.data.debitAmount1).not.be.null;\r",
+											"    pm.expect(jsonData.data.debitAmount2).not.be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Test data type of the response\", function() {\r",
+											"  pm.expect(jsonData).to.be.an(\"object\");\r",
+											"  pm.expect(jsonData.data.depositAmount).to.be.a(\"string\");\r",
+											"  pm.expect(jsonData.data.debitAmount1).to.be.a(\"string\");\r",
+											"  pm.expect(jsonData.data.debitAmount2).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"//----------------------------------------------------------\r",
+											"\r",
+											"var millisecondsToWait = 3000;\r",
+											"\r",
+											"//Consulta a bdd\r",
+											"const echoPostRequestP2B= {\r",
+											"url: 'https://192.168.234.75:8083/utilityDB/db-query',\r",
+											"    method: 'POST',\r",
+											"    header: {\r",
+											"        'content-type': 'application/json'\r",
+											"    },\r",
+											"    body: {\r",
+											"        mode: 'raw',\r",
+											"        raw: JSON.stringify(\r",
+											"{\r",
+											"    \"table\": \"(SELECT * FROM BUSINESS_AFFILIATION_TRANSFERS ORDER BY TRANSACTIONDATE DESC)\",\r",
+											"    \"fields\": [\r",
+											"        \"TRANSACTIONID\",\r",
+											"        \"TRANSACTIONTYPE\",\r",
+											"        \"TRANSACTIONDATE\",\r",
+											"        \"TARGETPLASTICNUMBER\", \r",
+											"        \"TARGETCUSTOMERID\",\r",
+											"        \"TRANSACTIONSTATUS\",\r",
+											"        \"REVERSEDDATE\",\r",
+											"        \"SOURCEPLASTICNUMBER\",\r",
+											"        \"EFFECTIVEDATE\",\r",
+											"        \"SOURCECUSTOMERID\",\r",
+											"        \"CHANNELID\",\r",
+											"        \"BTRANSSTATUSCODE\",\r",
+											"        \"AUDITTRACENUMBER\",\r",
+											"        \"AMOUNT\",\r",
+											"        \"ACCOUNTSECTION\",\r",
+											"        \"SOURCEID\",\r",
+											"        \"TARGETID\"\r",
+											"    ],\r",
+											"    \"where\": \"SOURCEID = '\"+ pm.variables.get(\"sourceID\") + \"' AND TARGETID = '\"+ pm.variables.get(\"targetID\") +\"' AND rownum <= 2\"\r",
+											"}\r",
+											"        )\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"setTimeout(function() {\r",
+											"\r",
+											"pm.sendRequest(echoPostRequestP2B, function (err, response) {\r",
+											"\r",
+											"      if (err) {\r",
+											"          throw err;\r",
+											"      }\r",
+											"      if (response.code !== 200) {\r",
+											"          throw new Error('Invalid request.');\r",
+											"      }\r",
+											"\r",
+											"pm.test(\"Validate data\", function (){\r",
+											"var count = Object.keys(response.json()).length;\r",
+											"console.log(\"The number of cards is: \" + count);\r",
+											"\r",
+											"for(var i= 0; i < count; i++){\r",
+											"    pm.expect(response.json()).to.be.an(\"array\");\r",
+											"    pm.expect(response.json()[i]).to.have.keys('TRANSACTIONID','TRANSACTIONDATE','TRANSACTIONTYPE', 'TARGETPLASTICNUMBER', 'TARGETCUSTOMERID', 'TRANSACTIONSTATUS', 'REVERSEDDATE', 'SOURCEPLASTICNUMBER', 'EFFECTIVEDATE', 'SOURCECUSTOMERID', 'CHANNELID', 'BTRANSSTATUSCODE', 'AUDITTRACENUMBER', 'AMOUNT', 'ACCOUNTSECTION', 'SOURCEID', 'TARGETID').and.be.an(\"object\");\r",
+											"\r",
+											"    var audit = response.json()[i].AUDITTRACENUMBER.toString();\r",
+											"\r",
+											"    pm.expect(response.json()[i].TRANSACTIONID).to.not.be.null;\r",
+											"    pm.expect(pm.variables.get(\"TRANSACTIONDATE\")).to.eql(response.json()[i].TRANSACTIONDATE.substring(0, 10));\r",
+											"\tpm.expect(response.json()[i].TRANSACTIONTYPE).to.eql(pm.variables.get(\"transactionType\"));\r",
+											"\tpm.expect(pm.variables.get(\"plasticNumber_target\")).to.eql(response.json()[i].TARGETPLASTICNUMBER);\r",
+											"    pm.expect(pm.variables.get(\"customerID_target\")).to.eql(response.json()[i].TARGETCUSTOMERID);\r",
+											"\tpm.expect(pm.variables.get(\"status\")).to.eql(response.json()[i].TRANSACTIONSTATUS);\r",
+											"    pm.expect(response.json()[i].REVERSEDDATE).have.null;\r",
+											"    pm.expect(pm.variables.get(\"plasticNumber_source\")).to.eql(response.json()[i].SOURCEPLASTICNUMBER);\r",
+											"    pm.expect(pm.variables.get(\"EFFECTIVEDATE\")).to.eql(response.json()[i].EFFECTIVEDATE.substring(0, 10))\r",
+											"    pm.expect(pm.variables.get(\"customerID_source\")).to.eql(response.json()[i].SOURCECUSTOMERID);\r",
+											"\tpm.expect(pm.variables.get(\"channelID\")).to.eql(response.json()[i].CHANNELID);\r",
+											"\tpm.expect(pm.variables.get(\"btransStatusCode\")).to.eql(response.json()[i].BTRANSSTATUSCODE);\r",
+											"    pm.expect(audit.length).to.eql(5);\r",
+											"    pm.expect(response.json()[i].AMOUNT).to.not.be.null;\r",
+											"\tpm.expect(pm.variables.get(\"accountSection_source\")).to.eql(response.json()[i].ACCOUNTSECTION);\r",
+											"    pm.expect(pm.variables.get(\"sourceID\")).to.eql(response.json()[i].SOURCEID);\r",
+											"    pm.expect(pm.variables.get(\"targetID\")).to.eql(response.json()[i].TARGETID);\r",
+											"\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"});\r",
+											"}, millisecondsToWait);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwttoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{Host}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"type\": \"{{type}}\",\r\n    \"sourcePayload\": {\r\n        \"customerId\": {{customerID_source}},\r\n        \"phoneNumber\": \"{{phoneNumber_source}}\",\r\n        \"plasticNumber\": \"{{plasticNumber_source}}\",\r\n        \"expirationMonth\": \"{{expirationMonth_source}}\",\r\n        \"expirationYear\": \"{{expirationYear_source}}\",\r\n        \"accountSection\": {{accountSection_source}}\r\n    },\r\n    \"targetPayload\": {\r\n        \"customerId\": {{customerID_target}},\r\n        \"phoneNumber\": \"{{phoneNumber_target}}\",\r\n        \"plasticNumber\": \"{{plasticNumber_target}}\",\r\n        \"expirationMonth\": \"{{expirationMonth_target}}\",\r\n        \"expirationYear\": \"{{expirationYear_target}}\",\r\n        \"accountSection\": {{accountSection_target}}\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}/businessProcess",
+									"host": [
+										"{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}"
+									],
+									"path": [
+										"businessProcess"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Small Debits - Business Process - Expired",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var headerContentType = pm.response.headers.get(\"Content-Type\");\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Validate response code\", function() {\r",
+											"    pm.response.to.have.status(401).and.to.have.status(\"Unauthorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate header content type\", function () {\r",
+											"    pm.response.to.be.header(\"Content-Type\", headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate Status\", function () {\r",
+											"    pm.expect(\"error\").to.eql(jsonData.status);\r",
+											"    });\r",
+											"\r",
+											" pm.test(\"Validate JsonFormat\", function(){\r",
+											"    pm.expect(\"application/json\").to.eql(headerContentType);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate not be null or null\", function(){\r",
+											"    pm.expect(jsonData.message).not.be.null;\r",
+											"    pm.expect(jsonData.errorcode).not.be.null;\r",
+											"    pm.expect(jsonData.data).be.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validate message\", function() {\r",
+											"    pm.expect(pm.response.text()).to.include(\"The Token has expired on\");\r",
+											"    pm.expect(jsonData.errorcode).to.eql(\"token.expired\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"\r",
+											"\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJraWQiOiJqa2poYWRmNzg2NDYzNTRzc2RmZ3NkZmciLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIyMTQwNjc0NzMiLCJhdWQiOiJoamtmdnUzNW50Y29zOTQ0M2R6c3puYW52a3lzcDhzayIsImZpSWQiOiJFVlBSIiwibmJmIjoxNjE1NTcwMDA5LCJhenAiOlsiaGprZnZ1MzVudGNvczk0NDNkenN6bmFudmt5c3A4c2siXSwicGVybWlzc2lvbnMiOlsiY3VzdG9tZXIuY2FyZHMudHJhbnNmZXJzOndyaXRlIiwiY3VzdG9tZXIuY2FyZHM6cmVhZCIsIm9wZW5pZCIsImJ1c2luZXNzLnBhdGhzLmxpc3Q6cmVhZCIsImN1c3RvbWVyLmFjdGl2aXR5OnJlYWQiXSwiaXNzIjoiaHR0cHM6Ly9kZXYuZmlhcGkuYXRobW92aWwuY29tL29pZGMvIiwic2NvcGVzIjpbImN1c3RvbWVyLmNhcmRzLnRyYW5zZmVyczp3cml0ZSIsImN1c3RvbWVyLmNhcmRzOnJlYWQiLCJvcGVuaWQiLCJidXNpbmVzcy5wYXRocy5saXN0OnJlYWQiLCJjdXN0b21lci5hY3Rpdml0eTpyZWFkIl0sImV4cCI6MTYxNTU3MDk2OSwiaWF0IjoxNjE1NTcwMDA5LCJub25jZSI6Ijk4OTgxMjM0MjE3NCJ9.nPc_AlU0mEicBB9Y6xCwOrNVO8LXKrGcu11uA_MWezMfuYvD6Vj4xiSUaKQm52FDXf8uMV0HAuraBcfiemqLqF5YmaFxtDimr8kPX2BO_i3ng2QAUmnY_Yw6pe4v2zp6bNTrKPd3k2tefdnLLqz5uKxxmwRr0ePyzTi9rdLZ7Bs6lpOlVMfqc2Ww5PTsZSIovwdp2o0cAhJJeXJeRMnHVJZc-_4COuEgAyVF00ZP41_AhabJA_8SelSGRZMhkAY-4Y80LlCikPK5BUzH_Yn_46CS32Pv1AjFi7PTjZDRLd6YQ5Aj3iHbCt1KukAHF6dnjr-cXhX6aYeoPvo2DGu4OQ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{Host}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\"type\": \"BUSINESS\",\r\n\"sourcePayload\": {\r\n\"customerId\": 214067473,\r\n\"phoneNumber\": \"7874591333\",\r\n\"plasticNumber\": \"aad8d8937d9e1cbd70e4e9c9251f7972c1fa4fe0808ee61e90fb870711e43fa2\",\r\n\"expirationMonth\": \"0afbc7016069d3510713dcac8c063314\",\r\n\"expirationYear\": \"979536301bbd67d8ec57a0122b139e42\",\r\n\"accountSection\": 1\r\n},\r\n\"targetPayload\": {\r\n\"customerId\": 44,\r\n\"phoneNumber\": \"7877599999\",\r\n\"plasticNumber\": \"2150cdeb747dfc05a250c8ff20d6114cc1fa4fe0808ee61e90fb870711e43fa2\",\r\n\"expirationMonth\": \"b973890d1338c182a175923259b09e14\",\r\n\"expirationYear\": \"ff9d85f295cc5c4d370af59924699994\",\r\n\"accountSection\": 1\r\n}\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}/businessProcess",
+									"host": [
+										"{{Server-ip}}{{Server-port}}{{small-debits-endpoint}}"
+									],
+									"path": [
+										"businessProcess"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"//Small-Debits BUSINESS PROCESS",
+									"pm.variables.set(\"type\", \"BUSINESS\");",
+									"pm.variables.set(\"status\", \"COMPLETED\");",
+									"pm.variables.set(\"statusError\", \"FAILED\");",
+									"pm.variables.set(\"channelID\", \"5\");",
+									"pm.variables.set(\"transactionType\", \"P2B_TRANSFER\");",
+									"pm.variables.set(\"btransStatusCode\", \"00\");",
+									"pm.variables.set(\"TRANSACTIONDATE\", new Date(Date.now()).toISOString().substring(0,10));",
+									"pm.variables.set(\"EFFECTIVEDATE\", new Date(Date.now()).toISOString().substring(0,10));",
+									"pm.variables.set(\"plasticNumberInvalid\", \"xxxaad8d8937d921cbd70e4e9c9251f7972c1fa4fe0808ee61e90fb870711e43fa2\");",
+									"",
+									"",
+									"//sourcePayload",
+									"pm.variables.set(\"customerID_source\", \"215070138\");",
+									"pm.variables.set(\"phoneNumber_source\", 7874591333);",
+									"pm.variables.set(\"plasticNumber_source\", \"aad8d8937d9e1cbd70e4e9c9251f7972c1fa4fe0808ee61e90fb870711e43fa2\");",
+									"pm.variables.set(\"expirationMonth_source\", \"0afbc7016069d3510713dcac8c063314\");",
+									"pm.variables.set(\"expirationYear_source\", \"979536301bbd67d8ec57a0122b139e42\");",
+									"pm.variables.set(\"accountSection_source\", 1);",
+									"pm.variables.set(\"sourceID\", \"7874591333\");",
+									"",
+									"",
+									"//targetPayload",
+									"pm.variables.set(\"customerID_target\", \"44\");",
+									"pm.variables.set(\"phoneNumber_target\", 7877599999);",
+									"pm.variables.set(\"plasticNumber_target\", \"2150cdeb747dfc05a250c8ff20d6114cc1fa4fe0808ee61e90fb870711e43fa2\");",
+									"pm.variables.set(\"expirationMonth_target\", \"b973890d1338c182a175923259b09e14\");",
+									"pm.variables.set(\"expirationYear_target\", \"ff9d85f295cc5c4d370af59924699994\");",
+									"pm.variables.set(\"accountSection_target\", 1);",
+									"pm.variables.set(\"targetID\", \"7877599999\");"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.collectionVariables.set(\"ContentSecurityPolicy\", \"default-src 'self' athmovil.com *.athmovil.com\");",
+							"pm.collectionVariables.set(\"StrictTransportSecurity\", \"max-age=31536000; includeSubDomains\");",
+							"pm.collectionVariables.set(\"XContentTypeOptions\",\"nosniff\");",
+							"pm.collectionVariables.set(\"XFrameOptions\", \"DENY\");"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Validate Headers Response\", function () {",
+							"var xContent = pm.response.headers.get(\"X-Content-Type-Options\");",
+							"var contentSecurity = pm.response.headers.get(\"Content-Security-Policy\");",
+							"var strictTransport = pm.response.headers.get(\"Strict-Transport-Security\");",
+							"var xFrame = pm.response.headers.get(\"X-Frame-Options\");",
+							"",
+							"    pm.expect(pm.collectionVariables.get(\"ContentSecurityPolicy\")).to.eql(contentSecurity);",
+							"    pm.expect(pm.collectionVariables.get(\"StrictTransportSecurity\")).to.eql(strictTransport);",
+							"    pm.expect(pm.collectionVariables.get(\"XContentTypeOptions\")).to.eql(xContent);",
+							"    pm.expect(pm.collectionVariables.get(\"XFrameOptions\")).to.eql(xFrame);",
+							"});"
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "code",
+			"value": ""
+		},
+		{
+			"key": "jwttoken",
+			"value": ""
+		},
+		{
+			"key": "DATE",
+			"value": ""
+		},
+		{
+			"key": "ContentSecurityPolicy",
+			"value": ""
+		},
+		{
+			"key": "StrictTransportSecurity",
+			"value": ""
+		},
+		{
+			"key": "XContentTypeOptions",
+			"value": ""
+		},
+		{
+			"key": "XFrameOptions",
+			"value": ""
+		}
+	]
+}
